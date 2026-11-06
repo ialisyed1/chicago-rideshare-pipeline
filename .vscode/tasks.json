@@ -1,0 +1,86 @@
+{
+  // Run any of these with Terminal > Run Task... (or Ctrl/Cmd+Shift+P > "Tasks: Run Task").
+  // Select your .venv interpreter first (Ctrl/Cmd+Shift+P > "Python: Select Interpreter").
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "0. Setup: install requirements",
+      "type": "shell",
+      "command": "${command:python.interpreterPath} -m pip install -r requirements.txt",
+      "problemMatcher": []
+    },
+    {
+      "label": "1. Extract: test one day (raw)",
+      "type": "shell",
+      "command": "${command:python.interpreterPath} src/extract.py raw --start ${input:testDay} --end ${input:testDay}",
+      "problemMatcher": []
+    },
+    {
+      "label": "2. Extract: trip-level sample month (raw)",
+      "type": "shell",
+      "command": "${command:python.interpreterPath} src/extract.py raw --start ${input:monthStart} --end ${input:monthEnd}",
+      "problemMatcher": []
+    },
+    {
+      "label": "3. Extract: aggregated history (agg)",
+      "type": "shell",
+      "command": "${command:python.interpreterPath} src/extract.py agg --start ${input:aggStart}",
+      "problemMatcher": []
+    },
+    {
+      "label": "4. Data-quality checks",
+      "type": "shell",
+      "command": "${command:python.interpreterPath} src/quality_checks.py",
+      "problemMatcher": []
+    },
+    {
+      "label": "5. dbt: seed + build (models and tests)",
+      "type": "shell",
+      "options": { "cwd": "${workspaceFolder}/dbt_rideshare" },
+      "command": "../.venv/bin/dbt seed --profiles-dir . && ../.venv/bin/dbt build --profiles-dir .",
+      "windows": {
+        "command": "..\\.venv\\Scripts\\dbt.exe seed --profiles-dir . ; if ($?) { ..\\.venv\\Scripts\\dbt.exe build --profiles-dir . }"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "5b. dbt: docs (lineage graph)",
+      "type": "shell",
+      "options": { "cwd": "${workspaceFolder}/dbt_rideshare" },
+      "command": "../.venv/bin/dbt docs generate --profiles-dir . && ../.venv/bin/dbt docs serve --profiles-dir .",
+      "windows": {
+        "command": "..\\.venv\\Scripts\\dbt.exe docs generate --profiles-dir . ; if ($?) { ..\\.venv\\Scripts\\dbt.exe docs serve --profiles-dir . }"
+      },
+      "isBackground": true,
+      "problemMatcher": []
+    },
+    {
+      "label": "6. Reconcile trip-level vs aggregated counts",
+      "type": "shell",
+      "command": "${command:python.interpreterPath} src/reconcile.py",
+      "problemMatcher": []
+    },
+    {
+      "label": "7. Export dashboard CSVs",
+      "type": "shell",
+      "command": "${command:python.interpreterPath} src/export.py analysis/export.sql && ${command:python.interpreterPath} src/export.py analysis/export_trip_sample.sql",
+      "windows": {
+        "command": "${command:python.interpreterPath} src/export.py analysis/export.sql ; if ($?) { ${command:python.interpreterPath} src/export.py analysis/export_trip_sample.sql }"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Run full pipeline (last 45 days)",
+      "type": "shell",
+      "command": "${command:python.interpreterPath} src/run_pipeline.py",
+      "problemMatcher": [],
+      "group": { "kind": "build", "isDefault": true }
+    }
+  ],
+  "inputs": [
+    { "id": "testDay", "type": "promptString", "description": "Test day (YYYY-MM-DD)", "default": "2025-09-02" },
+    { "id": "monthStart", "type": "promptString", "description": "Sample month start (YYYY-MM-DD)", "default": "2025-09-01" },
+    { "id": "monthEnd", "type": "promptString", "description": "Sample month end (YYYY-MM-DD)", "default": "2025-09-30" },
+    { "id": "aggStart", "type": "promptString", "description": "Aggregates start date (YYYY-MM-DD)", "default": "2025-01-01" }
+  ]
+}

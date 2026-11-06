@@ -1,0 +1,9 @@
+# Kept in the repo so the project runs anywhere. Always run dbt from this folder
+# with --profiles-dir . (the VS Code tasks and run_pipeline.py already do).
+dbt_rideshare:
+  target: dev
+  outputs:
+    dev:
+      type: duckdb
+      path: ../warehouse/rideshare.duckdb
+      threads: 4

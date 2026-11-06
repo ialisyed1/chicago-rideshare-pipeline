@@ -1,0 +1,23 @@
+name: dbt_rideshare
+version: "1.0"
+config-version: 2
+profile: dbt_rideshare
+
+model-paths: ["models"]
+seed-paths: ["seeds"]
+target-path: "target"
+clean-targets: ["target", "dbt_packages"]
+
+models:
+  dbt_rideshare:
+    staging:
+      +materialized: view
+    marts:
+      +materialized: table
+
+seeds:
+  dbt_rideshare:
+    community_areas:
+      +column_types:
+        area_id: integer
+        area_name: varchar

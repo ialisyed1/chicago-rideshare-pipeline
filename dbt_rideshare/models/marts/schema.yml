@@ -1,0 +1,56 @@
+version: 2
+
+models:
+  - name: dim_date
+    description: Calendar dimension, one row per day from 2025-01-01 to today.
+    columns:
+      - name: date_day
+        tests: [unique, not_null]
+      - name: day_of_week
+        description: 0 = Sunday through 6 = Saturday.
+      - name: is_weekend
+        description: True for Saturday and Sunday.
+
+  - name: dim_community_area
+    description: Chicago's 77 community areas plus key 0 for outside Chicago or privacy-suppressed.
+    columns:
+      - name: area_id
+        tests: [unique, not_null]
+      - name: area_name
+        tests: [not_null]
+
+  - name: fct_trips
+    description: One row per rideshare trip for the trip-level sample period.
+    columns:
+      - name: trip_id
+        tests: [unique, not_null]
+      - name: pickup_area_key
+        description: Pickup community area, 0 if outside Chicago or suppressed.
+        tests:
+          - relationships:
+              to: ref('dim_community_area')
+              field: area_id
+      - name: is_clean
+        description: False if the trip fails any warning-level data-quality rule (see docs/dq_report.md).
+
+  - name: fct_hourly_demand
+    description: Trips and money totals by date, hour, pickup area, dropoff area and shared flag.
+    columns:
+      - name: pickup_area_key
+        tests:
+          - not_null
+          - relationships:
+              to: ref('dim_community_area')
+              field: area_id
+      - name: trips
+        tests: [not_null]
+
+  - name: mart_daily_kpis
+    description: Daily headline KPIs for the dashboard.
+    columns:
+      - name: trip_date
+        tests: [unique, not_null]
+      - name: fare_per_mile
+        description: Total fare divided by total miles (fares are rounded to $2.50 by the City).
+      - name: shared_request_share
+        description: Share of trips where the rider agreed to a shared ride.

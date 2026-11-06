@@ -1,0 +1,32 @@
+{
+  // Debug configurations: set breakpoints, then press F5 and pick one.
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Debug extract (one day, raw)",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/src/extract.py",
+      "args": ["raw", "--start", "2025-09-02", "--end", "2025-09-02"],
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal"
+    },
+    {
+      "name": "Debug extract (one day, agg)",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/src/extract.py",
+      "args": ["agg", "--start", "2025-09-02", "--end", "2025-09-02"],
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal"
+    },
+    {
+      "name": "Debug quality checks",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/src/quality_checks.py",
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal"
+    }
+  ]
+}

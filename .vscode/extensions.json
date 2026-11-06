@@ -1,0 +1,10 @@
+{
+  "recommendations": [
+    "ms-python.python",
+    "ms-python.vscode-pylance",
+    "innoverio.vscode-dbt-power-user",
+    "redhat.vscode-yaml",
+    "mechatroner.rainbow-csv",
+    "github.vscode-github-actions"
+  ]
+}

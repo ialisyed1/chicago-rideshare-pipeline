@@ -1,0 +1,29 @@
+# Secrets
+.env
+
+# Python
+.venv/
+__pycache__/
+*.pyc
+
+# Data (re-creatable from the scripts; never commit)
+data/raw/*
+!data/raw/.gitkeep
+data/quarantine/*
+!data/quarantine/.gitkeep
+
+# Warehouse
+warehouse/*.duckdb
+warehouse/*.duckdb.wal
+
+# dbt
+dbt_rideshare/target/
+dbt_rideshare/dbt_packages/
+dbt_rideshare/logs/
+logs/
+
+# OS / editor
+.DS_Store
+Thumbs.db
+
+# Note: dashboard/*.csv IS committed (small aggregates the workflow refreshes).

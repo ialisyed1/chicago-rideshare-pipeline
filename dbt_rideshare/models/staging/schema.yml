@@ -1,0 +1,21 @@
+version: 2
+
+models:
+  - name: stg_trips
+    description: Trip-level data with types cast and duplicate trip_ids removed.
+    columns:
+      - name: trip_id
+        description: Unique trip identifier from the City.
+        tests: [unique, not_null]
+      - name: start_ts
+        description: Trip start, Chicago local time, rounded to 15 minutes by the City.
+        tests: [not_null]
+
+  - name: stg_hourly_od
+    description: Hourly server-side aggregates with types cast.
+    columns:
+      - name: trip_date
+        tests: [not_null]
+      - name: trips
+        description: Number of trips in the group.
+        tests: [not_null]

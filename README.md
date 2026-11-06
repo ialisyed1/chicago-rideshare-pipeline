@@ -94,4 +94,3 @@ In VS Code, every step is also available under **Terminal > Run Task**.
 - Fares rounded to $2.50 and times to 15 minutes by the City for privacy.
 - No company-level breakdown (not in the data).
 - Next: weather join, weekly demand forecast, Great Expectations, Google Sheets auto-refresh for Tableau.
-# chicago-rideshare-pipeline

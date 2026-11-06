@@ -1,0 +1,12 @@
+version: 2
+
+sources:
+  - name: raw
+    description: Raw Parquet files written by src/extract.py. Nothing is copied; dbt reads them in place.
+    meta:
+      external_location: "read_parquet('../data/raw/{name}/*/*.parquet', hive_partitioning = true, union_by_name = true)"
+    tables:
+      - name: trips
+        description: Every trip for the trip-level sample period, all columns as text.
+      - name: hourly_od
+        description: Server-side hourly aggregates by pickup/dropoff community area and shared-trip flag.

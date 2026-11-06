@@ -1,0 +1,21 @@
+{
+  "python.terminal.activateEnvironment": true,
+  "python.analysis.extraPaths": ["src"],
+  "files.associations": {
+    "dbt_rideshare/models/**/*.sql": "jinja-sql",
+    "dbt_rideshare/**/*.yml": "jinja-yaml"
+  },
+  "dbt.queryLimit": 500,
+  "files.exclude": {
+    "**/__pycache__": true,
+    "dbt_rideshare/target": true,
+    "dbt_rideshare/logs": true
+  },
+  "editor.rulers": [100],
+  "[python]": {
+    "editor.tabSize": 4
+  },
+  "[sql]": {
+    "editor.tabSize": 4
+  }
+}
