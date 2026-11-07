@@ -15,7 +15,8 @@ import argparse
 import logging
 import os
 import time
-from datetime import date, timedelta
+from concurrent.futures import ThreadPoolExecutor
+from datetime import date, datetime, timedelta
 
 import pandas as pd
 import requests
@@ -27,6 +28,7 @@ BASE_URL = "https://data.cityofchicago.org/resource/6dvr-xwnh.json"
 TOKEN = os.getenv("SODA_APP_TOKEN")
 HEADERS = {"X-App-Token": TOKEN} if TOKEN else {}
 PAGE_SIZE = 50_000
+HOUR_WORKERS = 4  # parallel hourly requests per day in raw mode; keep modest to be polite to the API
 
 # The API leaves out keys whose value is null, so a quiet day can be missing a
 # column entirely. Re-indexing to these lists keeps every file's schema the same.
@@ -98,9 +100,32 @@ def day_filter(day: date) -> str:
             f"AND trip_start_timestamp < '{nxt}T00:00:00'")
 
 
+def hour_filter(day: date, hour: int) -> str:
+    start = datetime.combine(day, datetime.min.time()) + timedelta(hours=hour)
+    end = start + timedelta(hours=1)
+    return (f"trip_start_timestamp >= '{start:%Y-%m-%dT%H:%M:%S}' "
+            f"AND trip_start_timestamp < '{end:%Y-%m-%dT%H:%M:%S}'")
+
+
+def fetch_hour(day: date, hour: int) -> pd.DataFrame:
+    """One hour of trips. An hour fits in one page, so no $order is needed
+    (sorting this dataset server-side is extremely slow). If an hour ever fills
+    a page, fall back to ordered paging so no rows are skipped or duplicated."""
+    where = hour_filter(day, hour)
+    page = fetch({"$where": where, "$limit": PAGE_SIZE})
+    if len(page) < PAGE_SIZE:
+        return pd.DataFrame(page)
+    log.warning("%s hour %s filled a page; falling back to ordered paging", day, hour)
+    return fetch_all({"$where": where, "$order": "trip_id"})
+
+
 def extract_raw(day: date) -> None:
-    """Every trip that started on `day`. Ordering by trip_id keeps paging stable."""
-    df = fetch_all({"$where": day_filter(day), "$order": "trip_id"})
+    """Every trip that started on `day`, fetched as 24 hourly queries in parallel."""
+    with ThreadPoolExecutor(max_workers=HOUR_WORKERS) as pool:
+        parts = list(pool.map(lambda h: fetch_hour(day, h), range(24)))
+    df = pd.concat(parts, ignore_index=True)
+    if not df.empty:
+        df = df.drop_duplicates(subset="trip_id")
     if df.empty:
         log.info("%s: no rows yet, skipping", day)
         return
