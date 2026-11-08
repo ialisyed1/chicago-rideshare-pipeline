@@ -27,3 +27,6 @@ logs/
 Thumbs.db
 
 # Note: dashboard/*.csv IS committed (small aggregates the workflow refreshes).
+
+# dbt anonymous user id
+dbt_rideshare/.user.yml

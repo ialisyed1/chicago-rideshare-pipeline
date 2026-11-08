@@ -14,8 +14,11 @@ os.makedirs("dashboard", exist_ok=True)
 
 con = duckdb.connect("warehouse/rideshare.duckdb")
 count = 0
-for stmt in open(sql_file).read().split(";"):
-    body = "\n".join(line for line in stmt.splitlines() if not line.strip().startswith("--"))
+# Drop comment lines *before* splitting on ";" so a semicolon inside a comment
+# doesn't produce a broken statement.
+sql = "\n".join(line for line in open(sql_file).read().splitlines()
+                if not line.strip().startswith("--"))
+for body in sql.split(";"):
     if body.strip():
         con.execute(body)
         count += 1
