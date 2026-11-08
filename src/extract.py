@@ -29,6 +29,8 @@ TOKEN = os.getenv("SODA_APP_TOKEN")
 HEADERS = {"X-App-Token": TOKEN} if TOKEN else {}
 PAGE_SIZE = 50_000
 HOUR_WORKERS = 4  # parallel hourly requests per day in raw mode; keep modest to be polite to the API
+DAY_WORKERS = 4   # parallel days in agg mode (each server-side group-by takes ~70s)
+AGG_LIMIT = 500_000
 
 # The API leaves out keys whose value is null, so a quiet day can be missing a
 # column entirely. Re-indexing to these lists keeps every file's schema the same.
@@ -149,8 +151,15 @@ def extract_agg(day: date) -> None:
     The date is not stored as a column: it comes from the folder name
     (trip_date=YYYY-MM-DD), which DuckDB reads as a column via hive partitioning.
     """
-    df = fetch_all({"$select": AGG_SELECT, "$where": day_filter(day),
-                    "$group": AGG_GROUP, "$order": AGG_GROUP})
+    params = {"$select": AGG_SELECT, "$where": day_filter(day), "$group": AGG_GROUP}
+    # One big unsorted page (busy days have ~50k groups). Only if a day ever
+    # fills it do we fall back to ordered paging, which is slower but stable.
+    page = fetch({**params, "$limit": AGG_LIMIT})
+    if len(page) < AGG_LIMIT:
+        df = pd.DataFrame(page)
+    else:
+        log.warning("%s filled the agg page; falling back to ordered paging", day)
+        df = fetch_all({**params, "$order": AGG_GROUP})
     if df.empty:
         log.info("%s: no rows yet, skipping", day)
         return
@@ -177,8 +186,22 @@ def main() -> None:
         parser.error("--end must be on or after --start")
 
     job = extract_raw if args.mode == "raw" else extract_agg
-    for day in daterange(args.start, args.end):
-        job(day)
+    workers = 1 if args.mode == "raw" else DAY_WORKERS  # raw already parallelizes within a day
+
+    def run(day: date):
+        try:
+            job(day)
+            return None
+        except Exception as exc:  # keep going; report failed days at the end
+            log.error("%s: FAILED: %s", day, exc)
+            return day
+
+    with ThreadPoolExecutor(max_workers=workers) as pool:
+        failed = [d for d in pool.map(run, daterange(args.start, args.end)) if d]
+    if failed:
+        log.error("Failed days (re-run these): %s", ", ".join(map(str, failed)))
+        raise SystemExit(1)
+    log.info("All days succeeded.")
 
 
 if __name__ == "__main__":
