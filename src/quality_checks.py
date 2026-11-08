@@ -103,10 +103,17 @@ lines += [
     "",
     "## Decisions",
     "",
+]
+# Keep any hand-written decisions from the previous report, so re-runs
+# (including the weekly CI job) don't wipe them out.
+REPORT = "docs/dq_report.md"
+previous = open(REPORT).read() if os.path.exists(REPORT) else ""
+kept = previous.split("## Decisions", 1)[1].strip() if "## Decisions" in previous else ""
+lines += kept.splitlines() if kept else [
     "<!-- One sentence per threshold you tuned and why. Example: Trips over 6 hours are kept but flagged; -->",
     "<!-- most are likely drivers forgetting to end the trip. -->",
 ]
-with open("docs/dq_report.md", "w") as f:
+with open(REPORT, "w") as f:
     f.write("\n".join(lines) + "\n")
 
 print("\n".join(lines[:len(results) + 6]))
