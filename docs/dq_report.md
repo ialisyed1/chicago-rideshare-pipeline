@@ -26,4 +26,5 @@ Null rates (expected, from privacy suppression or trips outside Chicago): pickup
 - **Miles <= 0 (176 rows):** median 4 minutes and a $7.50 fare (the minimum), with 57% starting and ending in the same community area, so these are real very short or cancelled-with-fee trips; kept but flagged because they would distort fare per mile.
 - **Miles > 150 (457 rows):** median 3 hours and $220 fare, which is consistent with genuine long-distance trips out of the city (for example to Milwaukee or Indiana), so these are real trips; kept but flagged so they don't skew average trip length.
 - **Fare > $500 (12 rows):** all 100-409 miles and 2-6 hours long at $1.50-$10.40 per mile, so they are real long trips rather than data-entry errors; kept but flagged.
-- **Missing pickup/dropoff area (~10%) and fare (0.33%):** expected from the City's privacy suppression and trips outside Chicago; these are grouped as area 0 rather than removed.
+- **Missing pickup/dropoff area (~10%):** expected from the City's privacy suppression and trips outside Chicago; these trips are grouped as area 0 rather than removed.
+- **Missing fare (0.33%, 24,769 trips):** kept in trip counts, but dbt marks them is_clean = false because fare, fee and tip metrics can't be computed for them. In total fct_trips has 25,322 unclean trips (0.34%), almost all of them missing a fare.

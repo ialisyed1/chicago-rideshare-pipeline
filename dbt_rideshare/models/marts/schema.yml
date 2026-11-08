@@ -28,8 +28,9 @@ models:
         description: Pickup community area, 0 if outside Chicago or suppressed.
         tests:
           - relationships:
-              to: ref('dim_community_area')
-              field: area_id
+              arguments:
+                to: ref('dim_community_area')
+                field: area_id
       - name: is_clean
         description: False if the trip fails any warning-level data-quality rule (see docs/dq_report.md).
 
@@ -40,8 +41,9 @@ models:
         tests:
           - not_null
           - relationships:
-              to: ref('dim_community_area')
-              field: area_id
+              arguments:
+                to: ref('dim_community_area')
+                field: area_id
       - name: trips
         tests: [not_null]
 
