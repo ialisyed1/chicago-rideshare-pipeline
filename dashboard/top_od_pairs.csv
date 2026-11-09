@@ -1,26 +1,26 @@
 origin,destination,trips
-Near North Side,Near North Side,4739113
-Near North Side,Loop,2849921
-Near North Side,Near West Side,2644679
-Loop,Near North Side,2597241
-Near West Side,Near North Side,2430623
-Near West Side,Near West Side,1901705
-Loop,Near West Side,1582285
-Near West Side,Loop,1516560
-Near North Side,Lincoln Park,1513616
-Lincoln Park,Near North Side,1508958
-Lake View,Lake View,1495069
-Near North Side,O'Hare,1437970
-Near North Side,Lake View,1420273
-Loop,Loop,1419909
-Lake View,Near North Side,1395515
-O'Hare,Near North Side,1203414
-West Town,Near North Side,1179838
-Near North Side,West Town,1151770
-Hyde Park,Hyde Park,1149702
-Lake View,Lincoln Park,1045339
-Lincoln Park,Lake View,1027052
-Loop,O'Hare,963250
-Lincoln Park,Lincoln Park,939449
-West Town,West Town,896235
-West Town,Near West Side,855723
+Near North Side,Near North Side,40890
+Near North Side,Loop,26937
+Loop,Near North Side,24426
+Near North Side,Near West Side,23443
+Near West Side,Near North Side,21820
+Near North Side,O'Hare,17010
+Near West Side,Near West Side,15409
+O'Hare,Near North Side,14810
+Loop,Near West Side,14365
+Loop,Loop,14136
+Lincoln Park,Near North Side,14052
+Near West Side,Loop,13660
+Near North Side,Lincoln Park,13624
+Near North Side,Lake View,12319
+Hyde Park,Hyde Park,11808
+Lake View,Near North Side,11794
+Loop,O'Hare,11605
+O'Hare,Loop,10954
+Lake View,Lake View,10700
+West Town,Near North Side,10446
+Near North Side,West Town,10273
+Lake View,Lincoln Park,8814
+Lincoln Park,Lake View,8708
+Lincoln Park,Lincoln Park,7789
+West Town,Near West Side,7161
